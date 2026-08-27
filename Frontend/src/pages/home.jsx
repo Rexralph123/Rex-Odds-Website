@@ -1,11 +1,23 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Target, Trophy, BarChart3, Clock, PieChart, Bell, Check } from "lucide-react";
 
-import { Target, Trophy, Clock, PieChart, Bell, BarChart3, Check } from "lucide-react";
-import { VerdictSlip } from "../components/VerdictSlip";
-import { OddsDigits } from "../components/OddsDigits";
-import { PredictionCard } from "../components/PredictionCard";
-import { CONFIG, formatNaira } from "../config/constants";
+import { usePredictions } from "../context/PredictionContext";
 
-export function Home({ go, onLockedClick, predictions }) {
+import VerdictSlip from "../components/VerdictSlip";
+import OddsDigits from "../components/OddsDigits";
+import PredictionCard from "../components/PredictionCard";
+import PremiumModal from "../components/PremiumModal";
+
+import { CONFIG } from "../config";
+import { formatNaira } from "../utils/formatNaira";
+
+export default function Home() {
+  const navigate = useNavigate();
+  const { predictions } = usePredictions();
+  const [modalOpen, setModalOpen] = useState(false);
+  const openLockModal = () => setModalOpen(true);
+
   const freePick = predictions.find((p) => p.type === "free");
   const twoOdds = predictions.filter((p) => p.type === "2odds").slice(0, 2);
   const fiveOdds = predictions.filter((p) => p.type === "5odds").slice(0, 3);
@@ -19,14 +31,12 @@ export function Home({ go, onLockedClick, predictions }) {
 
   return (
     <>
-      {/* HERO — grunge / graffiti treatment */}
+      {/* HERO */}
       <section className="relative overflow-hidden border-b border-[#1B211C] grunge-bg">
-        {/* torn diagonal accent slash */}
         <div className="absolute -top-10 -right-24 w-[420px] h-[420px] bg-[#1FDB77] opacity-[0.10] rotate-12 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-16 -left-20 w-[320px] h-[320px] bg-[#1FDB77] opacity-[0.08] -rotate-6 blur-3xl pointer-events-none" />
 
         <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-12 sm:pt-16 relative">
-          {/* icon row: STATS · PREDICT · WIN */}
           <div className="flex items-center justify-center gap-6 sm:gap-10 mb-10 text-[#D6E0DA]">
             {[[BarChart3, "Stats"], [Target, "Predict"], [Trophy, "Win"]].map(([Icon, label], i) => (
               <div key={label} className="flex items-center gap-6 sm:gap-10">
@@ -56,10 +66,10 @@ export function Home({ go, onLockedClick, predictions }) {
               and 5 Odds selections.
             </p>
             <div className="flex flex-wrap justify-center md:justify-start gap-3">
-              <button onClick={() => go("predictions")} className="bg-[#1FDB77] text-[#08130D] font-semibold uppercase text-sm tracking-wide px-6 py-3.5 rounded-sm hover:bg-[#3FE68B] transition-colors">
+              <button onClick={() => navigate("/predictions")} className="bg-[#1FDB77] text-[#08130D] font-semibold uppercase text-sm tracking-wide px-6 py-3.5 rounded-sm hover:bg-[#3FE68B] transition-colors">
                 View Today's Predictions
               </button>
-              <button onClick={() => go("premium")} className="border border-[#2E3A34] text-white font-medium uppercase text-sm tracking-wide px-6 py-3.5 rounded-sm hover:border-[#1FDB77] transition-colors">
+              <button onClick={() => navigate("/premium")} className="border border-[#2E3A34] text-white font-medium uppercase text-sm tracking-wide px-6 py-3.5 rounded-sm hover:border-[#1FDB77] transition-colors">
                 Get Premium
               </button>
             </div>
@@ -92,7 +102,6 @@ export function Home({ go, onLockedClick, predictions }) {
           )}
         </div>
 
-        {/* bottom stat strip: LIVE ODDS · DETAILED STATS · INSTANT ALERTS · WIN MORE */}
         <div className="border-t border-[#1B211C] bg-[#0A0D0B]/60">
           <div className="max-w-6xl mx-auto px-5 sm:px-8 py-6 grid grid-cols-2 sm:grid-cols-4 gap-6">
             {[[Clock, "Live Odds"], [PieChart, "Detailed Stats"], [Bell, "Instant Alerts"], [BarChart3, "Win More"]].map(([Icon, label]) => (
@@ -112,7 +121,7 @@ export function Home({ go, onLockedClick, predictions }) {
         </div>
         <div className="grid sm:grid-cols-2 gap-5 mb-16">
           {twoOdds.map((p) => (
-            <PredictionCard key={p.id} p={p} locked onLockedClick={onLockedClick} />
+            <PredictionCard key={p.id} p={p} locked onLockedClick={openLockModal} />
           ))}
         </div>
 
@@ -121,14 +130,14 @@ export function Home({ go, onLockedClick, predictions }) {
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-14">
           {fiveOdds.map((p) => (
-            <PredictionCard key={p.id} p={p} locked onLockedClick={onLockedClick} />
+            <PredictionCard key={p.id} p={p} locked onLockedClick={openLockModal} />
           ))}
         </div>
 
         <div className="text-center border border-[#1B211C] rounded-sm py-10 px-6 bg-[#0D120F]">
           <p className="font-display text-2xl text-white tracking-wide mb-2">UNLOCK PREMIUM PREDICTIONS</p>
           <p className="font-mono text-[#1FDB77] text-xl mb-6">{formatNaira(CONFIG.PREMIUM_PRICE_NGN)} / MONTH</p>
-          <button onClick={() => go("premium")} className="bg-[#1FDB77] text-[#08130D] font-semibold uppercase text-sm tracking-wide px-7 py-3.5 rounded-sm hover:bg-[#3FE68B] transition-colors">
+          <button onClick={() => navigate("/premium")} className="bg-[#1FDB77] text-[#08130D] font-semibold uppercase text-sm tracking-wide px-7 py-3.5 rounded-sm hover:bg-[#3FE68B] transition-colors">
             Get Premium
           </button>
         </div>
@@ -192,12 +201,12 @@ export function Home({ go, onLockedClick, predictions }) {
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-20 text-center">
         <p className="font-display text-3xl sm:text-4xl text-white tracking-wide mb-3">READY FOR TODAY'S PICKS?</p>
         <p className="text-[#93A69B] mb-8">Get access to our premium football predictions for just {formatNaira(CONFIG.PREMIUM_PRICE_NGN)}/month.</p>
-        <button onClick={() => go("premium")} className="bg-[#1FDB77] text-[#08130D] font-semibold uppercase text-sm tracking-wide px-8 py-4 rounded-sm hover:bg-[#3FE68B] transition-colors">
+        <button onClick={() => navigate("/premium")} className="bg-[#1FDB77] text-[#08130D] font-semibold uppercase text-sm tracking-wide px-8 py-4 rounded-sm hover:bg-[#3FE68B] transition-colors">
           Get Premium
         </button>
       </section>
+
+      <PremiumModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   );
 }
-EOF
-echo done

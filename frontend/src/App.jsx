@@ -18,6 +18,9 @@ import AuthPage from "./pages/AuthPage";
 import Account from "./pages/Account";
 
 import AdminDashboard from "./admin/AdminDashboard";
+import AdminLogin from "./admin/AdminLogin";
+import RequireAdmin from "./admin/RequireAdmin";
+import { ADMIN_LOGIN_PATH } from "./admin/adminConfig";
 
 export default function App() {
   return (
@@ -44,7 +47,15 @@ export default function App() {
               <Route path="/account" element={<Account />} />
               <Route
                 path="/admin"
-                element={<AdminDashboard />}
+                element={
+                  <RequireAdmin>
+                    <AdminDashboard />
+                  </RequireAdmin>
+                }
+              />
+              <Route
+                path={ADMIN_LOGIN_PATH}
+                element={<AdminLogin />}
               />
             </Routes>
 
