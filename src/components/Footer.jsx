@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-
-import CrestMark from "./CrestMark";
+import logo from "../images/RexOdds Logo.png";
 
 export default function Footer() {
   return (
@@ -8,11 +7,11 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
         <div className="col-span-2">
           <div className="flex items-center gap-2 mb-3">
-            <CrestMark className="w-6 h-6" />
+            <img src={logo} alt="RexOdds" className="h-6 w-auto" />
             <span className="font-display text-lg text-white">REX<span className="text-[#1FDB77]">ODDS</span></span>
           </div>
           <p className="text-sm text-[#7C8F85] max-w-sm leading-relaxed">
-            Daily football selections, backed by analysis, delivered straight — no noise, no false promises.
+            Daily football selections, backed by analysis, delivered straight, no noise, no false promises.
           </p>
         </div>
         <div>
@@ -36,7 +35,7 @@ export default function Footer() {
       <div className="border-t border-[#1B211C] px-5 sm:px-8 py-5">
         <p className="text-[11px] leading-relaxed text-[#5C6E65] max-w-3xl">
           Predictions are not guaranteed. Past results do not guarantee future performance.
-          Gamble responsibly and only stake money you can afford to lose. RexOdds is 18+.
+          Gamble responsibly and only stake money you can afford to lose. RexOdds 18+.
         </p>
       </div>
     </footer>

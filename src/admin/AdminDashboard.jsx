@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../admin/AdminAuthContext.jsx";
 import { usePredictions } from "../context/PredictionContext";
 import { seedSubscribers } from "../data/mockData";
 

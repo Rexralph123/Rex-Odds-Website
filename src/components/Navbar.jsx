@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import logo from "../images/RexOdds Logo.png";
 
 import {
   Menu,
@@ -10,7 +11,6 @@ import {
   Crown,
 } from "lucide-react";
 
-import CrestMark from "./CrestMark";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
@@ -36,7 +36,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 bg-[#0A0D0B]/90 backdrop-blur border-b border-[#1B211C]">
       <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <CrestMark className="w-7 h-7" />
+          <img src={logo} alt="RexOdds" className="h-8 w-auto" />
           <span className="font-display text-xl tracking-wide text-white">
             REX<span className="text-[#1FDB77]">ODDS</span>
           </span>

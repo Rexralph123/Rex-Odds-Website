@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, ShieldAlert } from "lucide-react";
+import logo from "../images/RexOdds Logo.png";
 
-import { useAuth } from "../context/AuthContext";
-import CrestMark from "../components/CrestMark";
+import { useAuth } from "../admin/AdminAuthContext.jsx";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function AdminLogin() {
     <div className="min-h-[70vh] flex items-center justify-center px-5 py-16">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <CrestMark className="w-9 h-9 mx-auto mb-4 opacity-80" />
+          <img src={logo} alt="RexOdds" className="h-9 w-auto mx-auto mb-4 opacity-80" />
           <p className="font-display text-xl text-white tracking-widest">ADMIN ACCESS</p>
         </div>
 
