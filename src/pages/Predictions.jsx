@@ -6,6 +6,7 @@ import { usePredictions } from "../context/PredictionContext";
 
 import Badge from "../components/Badge";
 import PredictionCard from "../components/PredictionCard";
+import BookingCodesCard from "../components/BookingCodesCard";
 
 import { CONFIG } from "../config";
 import { formatNaira } from "../utils/formatNaira";
@@ -118,6 +119,9 @@ export default function Predictions() {
           </div>
         </div>
       </div>
+
+      {/* BOOKING CODES */}
+      <BookingCodesCard />
 
       {/* FREE BANNER */}
       <div className="flex flex-wrap items-center gap-3 mb-10">

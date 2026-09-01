@@ -7,6 +7,7 @@ import {
 
 import { AuthProvider } from "./context/AuthContext";
 import { PredictionProvider } from "./context/PredictionContext";
+import { BookingCodeProvider } from "./context/BookingCodeContext";
 import { AuthProvider as AdminAuthProvider } from "./admin/AdminAuthContext.jsx";
 
 import Navbar from "./components/Navbar";
@@ -28,60 +29,62 @@ export default function App() {
   return (
     <AuthProvider>
       <PredictionProvider>
-        <AdminAuthProvider>
-          <BrowserRouter>
-            <div className="min-h-screen bg-[#0A0D0B] text-[#E9F0EC] font-sans">
+        <BookingCodeProvider>
+          <AdminAuthProvider>
+            <BrowserRouter>
+              <div className="min-h-screen bg-[#0A0D0B] text-[#E9F0EC] font-sans">
 
-              <Navbar />
+                <Navbar />
 
-              <Routes>
-                <Route path="/" element={<Home />} />
+                <Routes>
+                  <Route path="/" element={<Home />} />
 
-                <Route
-                  path="/predictions"
-                  element={<Predictions />}
-                />
+                  <Route
+                    path="/predictions"
+                    element={<Predictions />}
+                  />
 
-                <Route
-                  path="/premium"
-                  element={<Premium />}
-                />
+                  <Route
+                    path="/premium"
+                    element={<Premium />}
+                  />
 
-                <Route
-                  path="/login"
-                  element={<AuthPage mode="login" />}
-                />
+                  <Route
+                    path="/login"
+                    element={<AuthPage mode="login" />}
+                  />
 
-                <Route
-                  path="/register"
-                  element={<AuthPage mode="register" />}
-                />
+                  <Route
+                    path="/register"
+                    element={<AuthPage mode="register" />}
+                  />
 
-                <Route
-                  path="/account"
-                  element={<Account />}
-                />
+                  <Route
+                    path="/account"
+                    element={<Account />}
+                  />
 
-                <Route
-                  path="/admin"
-                  element={
-                    <RequireAdmin>
-                      <AdminDashboard />
-                    </RequireAdmin>
-                  }
-                />
+                  <Route
+                    path="/admin"
+                    element={
+                      <RequireAdmin>
+                        <AdminDashboard />
+                      </RequireAdmin>
+                    }
+                  />
 
-                <Route
-                  path={ADMIN_LOGIN_PATH}
-                  element={<AdminLogin />}
-                />
-              </Routes>
+                  <Route
+                    path={ADMIN_LOGIN_PATH}
+                    element={<AdminLogin />}
+                  />
+                </Routes>
 
-              <Footer />
+                <Footer />
 
-            </div>
-          </BrowserRouter>
-        </AdminAuthProvider>
+              </div>
+            </BrowserRouter>
+          </AdminAuthProvider>
+        </BookingCodeProvider>
       </PredictionProvider>
     </AuthProvider>
   );

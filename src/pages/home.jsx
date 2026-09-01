@@ -1,26 +1,13 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Target, Trophy, BarChart3, Clock, PieChart, Bell, Check } from "lucide-react";
 
-import { usePredictions } from "../context/PredictionContext";
-
-import VerdictSlip from "../components/VerdictSlip";
-import OddsDigits from "../components/OddsDigits";
-import PredictionCard from "../components/PredictionCard";
-import PremiumModal from "../components/PremiumModal";
+import BookingCodesCard from "../components/BookingCodesCard";
 
 import { CONFIG } from "../config";
 import { formatNaira } from "../utils/formatNaira";
 
 export default function Home() {
   const navigate = useNavigate();
-  const { predictions } = usePredictions();
-  const [modalOpen, setModalOpen] = useState(false);
-  const openLockModal = () => setModalOpen(true);
-
-  const freePick = predictions.find((p) => p.type === "free");
-  const twoOdds = predictions.filter((p) => p.type === "2odds").slice(0, 2);
-  const fiveOdds = predictions.filter((p) => p.type === "5odds").slice(0, 3);
 
   const stats = [
     { label: "Win Rate (30d)", value: "71%" },
@@ -75,31 +62,9 @@ export default function Home() {
             </div>
           </div>
 
-          {freePick && (
-            <div className="md:justify-self-end w-full max-w-sm mx-auto">
-              <div className="mb-2 flex justify-end">
-                <span className="bg-[#173B2A] text-[#3FE08C] text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-sm border border-[#2A6B49]">Free Pick · Live</span>
-              </div>
-              <VerdictSlip glow>
-                <p className="text-[11px] uppercase tracking-widest text-[#5C6E65] font-mono mb-1">{freePick.league}</p>
-                <p className="font-display text-2xl text-white mb-4 tracking-wide">{freePick.match}</p>
-                <div className="flex items-end justify-between mb-4">
-                  <div>
-                    <p className="text-[11px] uppercase tracking-widest text-[#5C6E65] mb-1">Prediction</p>
-                    <p className="text-white font-medium">{freePick.prediction}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[11px] uppercase tracking-widest text-[#5C6E65] mb-1">Odds</p>
-                    <OddsDigits value={freePick.odds} size="text-3xl" />
-                  </div>
-                </div>
-                <div className="border-t border-[#1B211C] pt-3 flex items-center justify-between">
-                  <span className="text-[11px] text-[#5C6E65] font-mono uppercase tracking-widest">Total Winnings</span>
-                  <span className="font-mono text-[#1FDB77] text-lg">₦350,000</span>
-                </div>
-              </VerdictSlip>
-            </div>
-          )}
+          <div className="md:justify-self-end w-full max-w-sm mx-auto">
+            <BookingCodesCard />
+          </div>
         </div>
 
         <div className="border-t border-[#1B211C] bg-[#0A0D0B]/60">
@@ -111,35 +76,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* PREMIUM PREVIEW */}
-      <section className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-20">
-        <div className="mb-10">
-          <p className="font-display text-3xl text-white tracking-wide">🔥 2 ODDS</p>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-5 mb-16">
-          {twoOdds.map((p) => (
-            <PredictionCard key={p.id} p={p} locked onLockedClick={openLockModal} />
-          ))}
-        </div>
-
-        <div className="mb-10">
-          <p className="font-display text-3xl text-white tracking-wide">🔥 5 ODDS</p>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-14">
-          {fiveOdds.map((p) => (
-            <PredictionCard key={p.id} p={p} locked onLockedClick={openLockModal} />
-          ))}
-        </div>
-
-        <div className="text-center border border-[#1B211C] rounded-sm py-10 px-6 bg-[#0D120F]">
-          <p className="font-display text-2xl text-white tracking-wide mb-2">UNLOCK PREMIUM PREDICTIONS</p>
-          <p className="font-mono text-[#1FDB77] text-xl mb-6">{formatNaira(CONFIG.PREMIUM_PRICE_NGN)} / MONTH</p>
-          <button onClick={() => navigate("/premium")} className="bg-[#1FDB77] text-[#08130D] font-semibold uppercase text-sm tracking-wide px-7 py-3.5 rounded-sm hover:bg-[#3FE68B] transition-colors">
-            Get Premium
-          </button>
         </div>
       </section>
 
@@ -205,8 +141,6 @@ export default function Home() {
           Get Premium
         </button>
       </section>
-
-      <PremiumModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   );
 }

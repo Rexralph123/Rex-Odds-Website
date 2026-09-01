@@ -1,61 +1,57 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { supabase } from "../lib/AdminsupabaseClient";
 
 const AuthContext = createContext(null);
 
-// Point this at your backend. In dev with Vite, set VITE_API_BASE in a
-// .env file, or just leave the fallback for local development.
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(() => localStorage.getItem("admin_token"));
-  // True while we're checking a stored token against the backend on
-  // mount/refresh. RequireAdmin waits for this before deciding whether
-  // to show the page or redirect, so a logged-in admin doesn't flash
-  // "RESTRICTED" for a moment on every refresh.
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!token) {
-      setLoading(false);
+  const handleSession = (session) => {
+    if (!session?.user) {
+      setUser(null);
       return;
     }
-    fetch(`${API_BASE}/api/admin/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data) => setUser(data.user))
-      .catch(() => {
-        localStorage.removeItem("admin_token");
-        setToken(null);
-      })
-      .finally(() => setLoading(false));
-  }, [token]);
+    setUser({
+      id: session.user.id,
+      email: session.user.email,
+      role:
+        session.user.app_metadata?.role ||
+        session.user.user_metadata?.role ||
+        "user",
+    });
+  };
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      handleSession(session);
+      setLoading(false);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => handleSession(session)
+    );
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   const login = async (email, password) => {
-    const res = await fetch(`${API_BASE}/api/admin/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || "Login failed.");
+    if (error) throw new Error(error.message || "Invalid email or password.");
+
+    const role = data.user.app_metadata?.role || data.user.user_metadata?.role;
+    if (role !== "admin") {
+      await supabase.auth.signOut();
+      throw new Error("This account does not have admin access.");
     }
-    localStorage.setItem("admin_token", data.token);
-    setToken(data.token);
-    setUser(data.user);
+    handleSession(data.session);
   };
 
   const logout = async () => {
-    if (token) {
-      await fetch(`${API_BASE}/api/admin/logout`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      }).catch(() => {});
-    }
-    localStorage.removeItem("admin_token");
-    setToken(null);
+    await supabase.auth.signOut();
     setUser(null);
   };
 

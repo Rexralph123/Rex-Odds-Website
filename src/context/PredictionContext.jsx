@@ -1,29 +1,92 @@
-import {
-  createContext,
-  useContext,
-  useState,
-} from "react";
-
-import { seedPredictions } from "../data/mockData";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { supabase } from "../lib/AdminsupabaseClient";
 
 const PredictionContext = createContext(null);
 
 export function PredictionProvider({ children }) {
-  const [predictions, setPredictions] =
-    useState(seedPredictions);
+  const [predictions, setPredictions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchPredictions = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("predictions")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Failed to load predictions:", error.message);
+      return;
+    }
+    setPredictions(data || []);
+  }, []);
+
+  useEffect(() => {
+    fetchPredictions().finally(() => setLoading(false));
+
+    // Keeps Home, Predictions, and Admin in sync live across tabs/devices
+    const channel = supabase
+      .channel("predictions-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "predictions" },
+        () => fetchPredictions()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchPredictions]);
+
+  const addPrediction = useCallback(async (data) => {
+    const { error } = await supabase.from("predictions").insert(data);
+    if (error) console.error("Failed to add prediction:", error.message);
+  }, []);
+
+  const updatePrediction = useCallback(async (id, changes) => {
+    const { error } = await supabase
+      .from("predictions")
+      .update(changes)
+      .eq("id", id);
+    if (error) console.error("Failed to update prediction:", error.message);
+  }, []);
+
+  const removePrediction = useCallback(async (id) => {
+    const { error } = await supabase.from("predictions").delete().eq("id", id);
+    if (error) console.error("Failed to delete prediction:", error.message);
+  }, []);
+
+  const results = predictions
+    .filter((p) => p.published && ["WON", "LOST"].includes(p.result))
+    .map((p) => ({
+      id: p.id,
+      match: p.match,
+      league: p.league,
+      prediction: p.prediction,
+      result: p.result === "WON" ? "win" : "loss",
+    }));
+
+  const value = {
+    predictions,
+    results,
+    loading,
+    addPrediction,
+    updatePrediction,
+    removePrediction,
+    refetch: fetchPredictions,
+  };
 
   return (
-    <PredictionContext.Provider
-      value={{
-        predictions,
-        setPredictions,
-      }}
-    >
+    <PredictionContext.Provider value={value}>
       {children}
     </PredictionContext.Provider>
   );
 }
 
 export function usePredictions() {
-  return useContext(PredictionContext);
+  const ctx = useContext(PredictionContext);
+  if (!ctx) {
+    throw new Error("usePredictions must be used within a PredictionProvider");
+  }
+  return ctx;
 }
