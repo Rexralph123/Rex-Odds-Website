@@ -51,7 +51,7 @@ export default function AdminDashboard() {
   const togglePublish = (p) => updatePrediction(p.id, { published: !p.published });
 
   // ---------- Booking Codes ----------
-  const blankCode = { id: "", bookmaker: "", code: "", note: "", active: true };
+  const blankCode = { id: "", type: "2odds", bookmaker: "", code: "", note: "", active: true };
 
   const saveCode = async (e) => {
     e.preventDefault();
@@ -170,6 +170,14 @@ export default function AdminDashboard() {
           {codeForm && (
             <form onSubmit={saveCode} className="border border-[#22C55E44] rounded-sm p-6 bg-[#0D120F] mb-8 grid sm:grid-cols-2 gap-4">
               <div>
+                <label className="text-xs uppercase tracking-widest text-[#7C8F85] mb-1.5 block">Category</label>
+                <select value={codeForm.type} onChange={(e) => setCodeForm({ ...codeForm, type: e.target.value })}
+                  className="w-full bg-[#121713] border border-[#2E3A34] rounded-sm px-3 py-2 text-white text-sm focus:outline-none focus:border-[#1FDB77]">
+                  <option value="2odds">2 Odds</option>
+                  <option value="5odds">5 Odds</option>
+                </select>
+              </div>
+              <div>
                 <label className="text-xs uppercase tracking-widest text-[#7C8F85] mb-1.5 block">Bookmaker</label>
                 <input value={codeForm.bookmaker} onChange={(e) => setCodeForm({ ...codeForm, bookmaker: e.target.value })} required
                   placeholder="e.g. SportyBet"
@@ -204,7 +212,7 @@ export default function AdminDashboard() {
               <div key={c.id} className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between px-5 py-4">
                 <div>
                   <p className="text-white text-sm font-medium">
-                    {c.bookmaker} <span className="text-[#5C6E65] font-mono text-xs">{c.code}</span>
+                    {c.bookmaker} <span className="text-[#5C6E65] font-mono text-xs">({c.type === "5odds" ? "5 Odds" : "2 Odds"}) {c.code}</span>
                   </p>
                   {c.note && <p className="text-xs text-[#7C8F85]">{c.note}</p>}
                 </div>
