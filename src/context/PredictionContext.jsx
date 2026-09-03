@@ -1,92 +1,73 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { supabase } from "../lib/AdminsupabaseClient";
 
-const PredictionContext = createContext(null);
+const BookingCodeContext = createContext(null);
 
-export function PredictionProvider({ children }) {
-  const [predictions, setPredictions] = useState([]);
+export function BookingCodeProvider({ children }) {
+  const [codes, setCodes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchPredictions = useCallback(async () => {
+  const fetchCodes = useCallback(async () => {
     const { data, error } = await supabase
-      .from("predictions")
+      .from("booking_codes")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Failed to load predictions:", error.message);
+      console.error("Failed to load booking codes:", error.message);
       return;
     }
-    setPredictions(data || []);
+    setCodes(data || []);
   }, []);
 
   useEffect(() => {
-    fetchPredictions().finally(() => setLoading(false));
+    fetchCodes().finally(() => setLoading(false));
 
-    // Keeps Home, Predictions, and Admin in sync live across tabs/devices
     const channel = supabase
-      .channel("predictions-changes")
+      .channel("booking-codes-changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "predictions" },
-        () => fetchPredictions()
+        { event: "*", schema: "public", table: "booking_codes" },
+        () => fetchCodes()
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchPredictions]);
+  }, [fetchCodes]);
 
-  const addPrediction = useCallback(async (data) => {
-    const { error } = await supabase.from("predictions").insert(data);
-    if (error) console.error("Failed to add prediction:", error.message);
+  const addCode = useCallback(async (data) => {
+    const { error } = await supabase.from("booking_codes").insert(data);
+    if (error) console.error("Failed to add booking code:", error.message);
   }, []);
 
-  const updatePrediction = useCallback(async (id, changes) => {
+  const updateCode = useCallback(async (id, changes) => {
     const { error } = await supabase
-      .from("predictions")
+      .from("booking_codes")
       .update(changes)
       .eq("id", id);
-    if (error) console.error("Failed to update prediction:", error.message);
+    if (error) console.error("Failed to update booking code:", error.message);
   }, []);
 
-  const removePrediction = useCallback(async (id) => {
-    const { error } = await supabase.from("predictions").delete().eq("id", id);
-    if (error) console.error("Failed to delete prediction:", error.message);
+  const removeCode = useCallback(async (id) => {
+    const { error } = await supabase.from("booking_codes").delete().eq("id", id);
+    if (error) console.error("Failed to delete booking code:", error.message);
   }, []);
 
-  const results = predictions
-    .filter((p) => p.published && ["WON", "LOST"].includes(p.result))
-    .map((p) => ({
-      id: p.id,
-      match: p.match,
-      league: p.league,
-      prediction: p.prediction,
-      result: p.result === "WON" ? "win" : "loss",
-    }));
-
-  const value = {
-    predictions,
-    results,
-    loading,
-    addPrediction,
-    updatePrediction,
-    removePrediction,
-    refetch: fetchPredictions,
-  };
+  const value = { codes, loading, addCode, updateCode, removeCode };
 
   return (
-    <PredictionContext.Provider value={value}>
+    <BookingCodeContext.Provider value={value}>
       {children}
-    </PredictionContext.Provider>
+    </BookingCodeContext.Provider>
   );
 }
 
-export function usePredictions() {
-  const ctx = useContext(PredictionContext);
+export function useBookingCodes() {
+  const ctx = useContext(BookingCodeContext);
   if (!ctx) {
-    throw new Error("usePredictions must be used within a PredictionProvider");
+    throw new Error("useBookingCodes must be used within a BookingCodeProvider");
   }
   return ctx;
 }
