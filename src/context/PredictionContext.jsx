@@ -1,73 +1,73 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { supabase } from "../lib/AdminsupabaseClient";
 
-const BookingCodeContext = createContext(null);
+const PredictionContext = createContext(null);
 
-export function BookingCodeProvider({ children }) {
-  const [codes, setCodes] = useState([]);
+export function PredictionProvider({ children }) {
+  const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchCodes = useCallback(async () => {
+  const fetchPredictions = useCallback(async () => {
     const { data, error } = await supabase
-      .from("booking_codes")
+      .from("predictions")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Failed to load booking codes:", error.message);
+      console.error("Failed to load predictions:", error.message);
       return;
     }
-    setCodes(data || []);
+    setPredictions(data || []);
   }, []);
 
   useEffect(() => {
-    fetchCodes().finally(() => setLoading(false));
+    fetchPredictions().finally(() => setLoading(false));
 
     const channel = supabase
-      .channel("booking-codes-changes")
+      .channel("predictions-changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "booking_codes" },
-        () => fetchCodes()
+        { event: "*", schema: "public", table: "predictions" },
+        () => fetchPredictions()
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchCodes]);
+  }, [fetchPredictions]);
 
-  const addCode = useCallback(async (data) => {
-    const { error } = await supabase.from("booking_codes").insert(data);
-    if (error) console.error("Failed to add booking code:", error.message);
+  const addPrediction = useCallback(async (data) => {
+    const { error } = await supabase.from("predictions").insert(data);
+    if (error) console.error("Failed to add prediction:", error.message);
   }, []);
 
-  const updateCode = useCallback(async (id, changes) => {
+  const updatePrediction = useCallback(async (id, changes) => {
     const { error } = await supabase
-      .from("booking_codes")
+      .from("predictions")
       .update(changes)
       .eq("id", id);
-    if (error) console.error("Failed to update booking code:", error.message);
+    if (error) console.error("Failed to update prediction:", error.message);
   }, []);
 
-  const removeCode = useCallback(async (id) => {
-    const { error } = await supabase.from("booking_codes").delete().eq("id", id);
-    if (error) console.error("Failed to delete booking code:", error.message);
+  const removePrediction = useCallback(async (id) => {
+    const { error } = await supabase.from("predictions").delete().eq("id", id);
+    if (error) console.error("Failed to delete prediction:", error.message);
   }, []);
 
-  const value = { codes, loading, addCode, updateCode, removeCode };
+  const value = { predictions, loading, addPrediction, updatePrediction, removePrediction };
 
   return (
-    <BookingCodeContext.Provider value={value}>
+    <PredictionContext.Provider value={value}>
       {children}
-    </BookingCodeContext.Provider>
+    </PredictionContext.Provider>
   );
 }
 
-export function useBookingCodes() {
-  const ctx = useContext(BookingCodeContext);
+export function usePredictions() {
+  const ctx = useContext(PredictionContext);
   if (!ctx) {
-    throw new Error("useBookingCodes must be used within a BookingCodeProvider");
+    throw new Error("usePredictions must be used within a PredictionProvider");
   }
   return ctx;
 }

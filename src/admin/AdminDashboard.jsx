@@ -51,7 +51,7 @@ export default function AdminDashboard() {
   const togglePublish = (p) => updatePrediction(p.id, { published: !p.published });
 
   // ---------- Booking Codes ----------
-  const blankCode = { id: "", type: "2odds", bookmaker: "", code: "", note: "", active: true };
+  const blankCode = { id: "", type: "2odds", bookmaker: "", code: "", note: "", active: true, result: "PENDING" };
 
   const saveCode = async (e) => {
     e.preventDefault();
@@ -67,6 +67,7 @@ export default function AdminDashboard() {
   };
 
   const toggleCodeActive = (c) => updateCode(c.id, { active: !c.active });
+  const toggleCodeResult = (id, result) => updateCode(id, { result });
 
   return (
     <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
@@ -188,6 +189,13 @@ export default function AdminDashboard() {
                 <input value={codeForm.code} onChange={(e) => setCodeForm({ ...codeForm, code: e.target.value })} required
                   className="w-full bg-[#121713] border border-[#2E3A34] rounded-sm px-3 py-2 text-white text-sm font-mono focus:outline-none focus:border-[#1FDB77]" />
               </div>
+              <div>
+                <label className="text-xs uppercase tracking-widest text-[#7C8F85] mb-1.5 block">Result</label>
+                <select value={codeForm.result} onChange={(e) => setCodeForm({ ...codeForm, result: e.target.value })}
+                  className="w-full bg-[#121713] border border-[#2E3A34] rounded-sm px-3 py-2 text-white text-sm focus:outline-none focus:border-[#1FDB77]">
+                  <option>PENDING</option><option>WON</option><option>LOST</option><option>VOID</option>
+                </select>
+              </div>
               <div className="sm:col-span-2">
                 <label className="text-xs uppercase tracking-widest text-[#7C8F85] mb-1.5 block">Note (optional)</label>
                 <input value={codeForm.note} onChange={(e) => setCodeForm({ ...codeForm, note: e.target.value })}
@@ -217,6 +225,10 @@ export default function AdminDashboard() {
                   {c.note && <p className="text-xs text-[#7C8F85]">{c.note}</p>}
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
+                  <select value={c.result} onChange={(e) => toggleCodeResult(c.id, e.target.value)}
+                    className="bg-[#121713] border border-[#2E3A34] rounded-sm px-2 py-1.5 text-xs text-white focus:outline-none">
+                    <option>PENDING</option><option>WON</option><option>LOST</option><option>VOID</option>
+                  </select>
                   <span className={`text-[10px] font-mono uppercase tracking-widest px-2 py-1 rounded-sm border ${
                     c.active
                       ? "text-[#3FE08C] border-[#2A6B49] bg-[#173B2A]"

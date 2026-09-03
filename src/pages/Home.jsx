@@ -2,18 +2,27 @@ import { useNavigate } from "react-router-dom";
 import { Target, Trophy, BarChart3, Clock, PieChart, Bell, Check } from "lucide-react";
 
 import BookingCodesCard from "../components/BookingCodesCard";
+import { useBookingCodes } from "../context/BookingCodeContext";
+import { usePredictions } from "../context/PredictionContext";
 
 import { CONFIG } from "../config";
 import { formatNaira } from "../utils/formatNaira";
+import { computeSlipStats, computeAvgOdds } from "../utils/computeStats";
 
 export default function Home() {
   const navigate = useNavigate();
 
+  const { codes } = useBookingCodes();
+  const { predictions } = usePredictions();
+
+  const { winRate, slipsPosted } = computeSlipStats(codes);
+  const avgOdds = computeAvgOdds(predictions);
+
   const stats = [
-    { label: "Win Rate (30d)", value: "71%" },
-    { label: "Slips Posted", value: "184" },
-    { label: "Avg. Odds", value: "1.9" },
-    { label: "Active Members", value: "1,240" },
+    { label: "Win Rate", value: `${winRate}%` },
+    { label: "Slips Posted", value: String(slipsPosted) },
+    { label: "Avg. Odds", value: avgOdds },
+    { label: "Active Members", value: "1,240" }, // placeholder — no members table wired up yet
   ];
 
   return (
@@ -121,7 +130,7 @@ export default function Home() {
           <div className="flex items-center justify-between mb-2">
             <p className="font-display text-3xl text-white tracking-wide">TRACK RECORD</p>
           </div>
-          <p className="text-xs text-[#5C6E65] mb-10 font-mono uppercase tracking-widest">Demo figures — live stats connect once results are logged</p>
+          <p className="text-xs text-[#5C6E65] mb-10 font-mono uppercase tracking-widest">Live — updates as results are logged in the admin dashboard</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((s) => (
               <div key={s.label} className="text-center border border-[#1B211C] rounded-sm py-8 bg-[#0A0D0B]">
