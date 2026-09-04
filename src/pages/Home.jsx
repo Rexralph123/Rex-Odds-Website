@@ -58,8 +58,8 @@ export default function Home() {
               Analyze. Predict. Profit.
             </p>
             <p className="text-[#93A69B] text-base max-w-md mx-auto md:mx-0 mb-8 leading-relaxed">
-              Carefully selected daily football predictions, including our 2 Odds
-              and 5 Odds selections.
+              Carefully selected daily football predictions, posted every
+              morning before 10am.
             </p>
             <div className="flex flex-wrap justify-center md:justify-start gap-3">
               <button onClick={() => navigate("/predictions")} className="bg-[#1FDB77] text-[#08130D] font-semibold uppercase text-sm tracking-wide px-6 py-3.5 rounded-sm hover:bg-[#3FE68B] transition-colors">
@@ -96,7 +96,7 @@ export default function Home() {
             {[
               ["01", "Create Your Account", "Sign up in under a minute with just your email."],
               ["02", "Subscribe", "Unlock full access for " + formatNaira(CONFIG.PREMIUM_PRICE_NGN) + "/month via Paystack."],
-              ["03", "Access Premium Predictions", "See every 2 Odds and 5 Odds selection, daily."],
+              ["03", "Access Premium Predictions", "See every premium selection, updated daily before 10am."],
             ].map(([n, t, d]) => (
               <div key={n}>
                 <p className="font-mono text-[#1FDB77] text-sm mb-3">{n}</p>
@@ -113,7 +113,7 @@ export default function Home() {
         <p className="font-display text-3xl text-white tracking-wide mb-10">WHY PREMIUM?</p>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
           {[
-            "Daily selections", "2 Odds & 5 Odds", "Match analysis",
+            "Daily selections", "Verified booking codes", "Match analysis",
             "Daily updates", "Prediction history", "Simple and transparent approach",
           ].map((f) => (
             <div key={f} className="flex items-center gap-3 border border-[#1B211C] rounded-sm px-4 py-4 bg-[#0D120F]">
